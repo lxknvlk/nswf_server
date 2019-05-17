@@ -1,0 +1,82 @@
+=======nsfw model, installing on aws ubuntu 18.04 instance (lsb_release -a)
+===install prereqs
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install git python python-pip
+sudo apt install caffe-cpu
+pip install numpy
+pip install image
+pip install scikit-image
+pip install protobuf
+sudo apt-get install libprotobuf-dev libleveldb-dev libsnappy-dev libopencv-dev libhdf5-serial-dev protobuf-compiler
+sudo apt-get install --no-install-recommends libboost-all-dev
+sudo apt-get install libgflags-dev libgoogle-glog-dev liblmdb-dev libopenblas-dev libatlas-base-dev
+
+
+sudo apt-get install libopenblas-dev
+sudo apt-get install libatlas-base-dev
+
+sudo apt install npm
+npm install pm2@latest -g
+
+===install and compile caffe and pycaffe
+first install like this http://caffe.berkeleyvision.org/install_apt.html
+git clone https://github.com/BVLC/caffe.git
+cd caffe
+cp Makefile.config.example Makefile.config
+# Adjust Makefile.config - uncomment CPU_ONLY := 1 and OPENCV version = 3
+make all
+make pycaffe (dont run make distribute!!!!)
+add to end of .bashrc
+
+export PYTHONPATH=/home/ubuntu/caffe/python:$PYTHONPATH
+export PYTHONPATH=/home/ubuntu/caffe:$PYTHONPATH
+
+
+===clone repo: $ git clone https://github.com/yahoo/open_nsfw.git
+cd open_nsfw
+run with script command
+python ./classify_nsfw.py --model_def nsfw_model/deploy.prototxt --pretrained_model nsfw_model/resnet_50_1by2_nsfw.caffemodel /home/ubuntu/image/selfie.jpg
+
+==get faster and more precise model
+git clone https://github.com/TechnikEmpire/NsfwSqueezenet.git
+	
+run it:
+python ./classify_nsfw.py --model_def ../NsfwSqueezenet/model/deploy.prototxt --pretrained_model ../NsfwSqueezenet/model/nsfw_squeezenet.caffemodel /home/ubuntu/image/selfie.jpg
+
+
+python2 ./classify_nsfw.py --model_def nsfw_model/deploy.prototxt --pretrained_model nsfw_model/resnet_50_1by2_nsfw.caffemodel ~/image/porn.jpg
+
+===troubleshooting:
+> hdf5.h: No such file or directory
+cd /usr/lib/x86_64-linux-gnu
+sudo ln -s libhdf5_serial.so.8.0.2 libhdf5.so
+sudo ln -s libhdf5_serial_hl.so.8.0.2 libhdf5_hl.so
+
+MakeFile.config - modify lines
+INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial/
+LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu/hdf5/serial/
+
+>libcaffe.so: undefined reference to `cv::imread(cv::String const&, int)'
+ uncomment the OPENCV_VERSION variable in Makefile.config to 3
+make clean, sudo ldconfig, then proceed
+
+>ImportError: No module named caffe
+make sure caffe and pycaffe is installed and built and add to pythonpath add to end of .bashrc
+export PYTHONPATH=/home/alex/Workspace/caffe/python:$PYTHONPATH
+export PYTHONPATH=/home/alex/Workspace/caffe:$PYTHONPATH
+
+> fatal error: cblas.h: No such file or directory #include <cblas.h>
+sudo apt-get install libopenblas-dev
+
+
+>/usr/bin/ld: cannot find -lcblas   /usr/bin/ld: cannot find -latlas
+sudo apt-get install libatlas-base-dev
+
+
+>numpy/arrayobject.h: No such file or directory (https://stackoverflow.com/questions/44888925/fatal-error-numpy-arrayobject-h-no-such-file-or-directory)
+sudo find / -name arrayobject.h
+ls -l /usr/include/numpy (if cant find this, make a simlink to results of find)
+sudo ln -s  <pathfrom find command> /usr/include/numpy
+in my case it was
+sudo ln -s /home/ubuntu/.local/lib/python2.7/site-packages/numpy/core/include/numpy /usr/include/numpy
