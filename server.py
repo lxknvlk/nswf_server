@@ -33,12 +33,6 @@ def handleRequest(req):
 
     binary_data = a2b_base64(image_data)
 
-    #print "=====binary", binary_data
-
-    #fd = open('image.jpg','wb')
-    #fd.write(binary_data)
-    #fd.close()
-    
     scores = caffe_preprocess_and_compute(binary_data, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
     result = scores[1][0][0]
 
