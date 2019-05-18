@@ -24,6 +24,7 @@ from StringIO import StringIO
 import caffe
 import json
 from binascii import a2b_base64
+from threading import Thread
 
 def handleRequest(req):
     length = int(req.headers.getheader('content-length')) #gets correct length of data
@@ -110,7 +111,8 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
 
 class MyHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
-	handleRequest(self)
+        Thread(target = handleRequest(self)).start()
+        #handleRequest(self)
 	return
 
 pycaffe_dir = os.path.dirname(__file__)
