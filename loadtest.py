@@ -13,20 +13,23 @@ from threading import Thread
 import time
 
 def makeRequest(num):
-	data = {'image': encoded_data}
-	#data = {'image': 'none'}
+	for x in range(num):
+		data = {'image': encoded_data}
+		#data = {'image': 'none'}
 
-	req = urllib2.Request('http://0.0.0.0:8000')
-	req.add_header('Content-Type', 'application/json')
+		print 'started request ', num
 
-	response = urllib2.urlopen(req, json.dumps(data))
+		req = urllib2.Request('http://0.0.0.0:8000')
+		req.add_header('Content-Type', 'application/json')
 
-	end = int(round(time.time() * 1000))
+		response = urllib2.urlopen(req, json.dumps(data))
 
-	diff = end - start
+		end = int(round(time.time() * 1000))
 
-	print num , ' request made, diff from start', diff
-	print '\n'
+		diff = end - start
+
+		print num , 'request made, diff from start', diff
+		print '\n'
 
 if __name__ == '__main__':
 	image_handle = open('image/image.jpg', 'rb')
@@ -35,11 +38,16 @@ if __name__ == '__main__':
 
 	start = int(round(time.time() * 1000))
 
-	i = int(sys.argv[1])
+	threads = int(sys.argv[1])
+	loops = int(sys.argv[2])
 
-	print 'running loadtest with requests: ' , i
+	print ("starting script with " + str(threads) + " threads and " + str(loops) + " loops")
 
-	for x in range(i):
-		Thread(target = makeRequest(i)).start()
+	#for x in range(i):
+	#	print 'starting req in loop', x
+	#	Thread(target = makeRequest(x + 1)).start()
+
+	p = Pool(threads)
+	print(p.map(makeRequest(loops)), range(threads))
 
 	print 'finished script'

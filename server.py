@@ -37,7 +37,7 @@ def handleRequest(req):
     scores = caffe_preprocess_and_compute(binary_data, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
     result = scores[1][0][0]
 
-    #print "result: " , result
+    print "result: " , result
 
     resp = {'score' : result}
     req.send_response(200)
