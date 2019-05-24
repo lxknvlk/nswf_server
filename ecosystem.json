@@ -2,10 +2,11 @@
   apps : [{
     name: 'server',
     script: 'server.py',
-    watch: false,
-    instances: 4,
+    watch: true,
+    instances: 1,
     exec_mode: 'cluster',
     max_memory_restart : "500M",
-    interpreter : "/usr/bin/python"
+    interpreter : "pipenv",
+    node_args: "run python3"
   }]
 }
