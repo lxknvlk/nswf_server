@@ -20,7 +20,10 @@ import argparse
 import glob
 import time
 from PIL import Image
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 import caffe
 import json
 from binascii import a2b_base64
@@ -37,7 +40,7 @@ def handleRequest(req):
     scores = caffe_preprocess_and_compute(binary_data, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
     result = scores[1][0][0]
 
-    print "result: " , result
+    #print ("result: " , result)
 
     resp = {'score' : result}
     req.send_response(200)
@@ -113,7 +116,7 @@ class MyHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
         Thread(target = handleRequest(self)).start()
         #handleRequest(self)
-	return
+        return
 
 pycaffe_dir = os.path.dirname(__file__)
 
@@ -132,7 +135,7 @@ caffe_transformer.set_mean('data', np.array([104, 117, 123]))  # subtract the da
 caffe_transformer.set_raw_scale('data', 255)  # rescale from [0, 1] to [0, 255]
 caffe_transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
 
-print "====image classification model initialized===="
+#print ("====image classification model initialized====")
 
 if sys.argv[1:]:
     address = sys.argv[1]
