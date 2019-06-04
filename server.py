@@ -34,6 +34,24 @@ def curtime():
 
 def handleRequest(req):
     startTime = curtime()
+    pycaffe_dir = os.path.dirname(__file__)
+
+    model_def = "NsfwSqueezenet/model/deploy.prototxt"
+    pretrained_model = "NsfwSqueezenet/model/nsfw_squeezenet.caffemodel"
+
+    # Pre-load caffe model.
+    nsfw_net = caffe.Net(model_def, pretrained_model, caffe.TEST)
+
+    # Load transformer
+    # Note that the parameters are hard-coded for best results
+    caffe_transformer = caffe.io.Transformer({'data': nsfw_net.blobs['data'].data.shape})
+    caffe_transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost
+    caffe_transformer.set_mean('data', np.array([104, 117, 123]))  # subtract the dataset-mean value in each channel
+    caffe_transformer.set_raw_scale('data', 255)  # rescale from [0, 1] to [0, 255]
+    caffe_transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
+    midTime = curtime()
+    diffTime = midTime - startTime
+    print ("==== image classification model initialized in " + str(diffTime) + " ms ====")
 
     length = int(req.headers.getheader('content-length')) #gets correct length of data
     json_data = req.rfile.read(length) #gets json   {"image": "/9j/4AAQ...data"}
@@ -141,26 +159,6 @@ class MyHandler(SimpleHTTPRequestHandler):
         handleRequest(self)
         return
 
-startTime = curtime()
-pycaffe_dir = os.path.dirname(__file__)
-
-model_def = "NsfwSqueezenet/model/deploy.prototxt"
-pretrained_model = "NsfwSqueezenet/model/nsfw_squeezenet.caffemodel"
-
-# Pre-load caffe model.
-nsfw_net = caffe.Net(model_def,  # pylint: disable=invalid-name
-        pretrained_model, caffe.TEST)
-
-# Load transformer
-# Note that the parameters are hard-coded for best results
-caffe_transformer = caffe.io.Transformer({'data': nsfw_net.blobs['data'].data.shape})
-caffe_transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost
-caffe_transformer.set_mean('data', np.array([104, 117, 123]))  # subtract the dataset-mean value in each channel
-caffe_transformer.set_raw_scale('data', 255)  # rescale from [0, 1] to [0, 255]
-caffe_transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
-endTime = curtime()
-diffTime = endTime - startTime
-print ("==== image classification model initialized in " + str(diffTime) + " ms ====")
 
 if sys.argv[1:]:
     address = sys.argv[1]
