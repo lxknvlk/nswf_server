@@ -32,8 +32,13 @@ from threading import Thread
 def curtime():
     return int(round(time.time() * 1000))
 
-def handleRequest(req):
+def logTime(msg):
+    global startTime
+    diffTime = curtime() - startTime
+    print (msg + " done in " + str(diffTime))
     startTime = curtime()
+
+def handleRequest(req):
     pycaffe_dir = os.path.dirname(__file__)
 
     model_def = "NsfwSqueezenet/model/deploy.prototxt"
@@ -49,9 +54,7 @@ def handleRequest(req):
     caffe_transformer.set_mean('data', np.array([104, 117, 123]))  # subtract the dataset-mean value in each channel
     caffe_transformer.set_raw_scale('data', 255)  # rescale from [0, 1] to [0, 255]
     caffe_transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
-    midTime = curtime()
-    diffTime = midTime - startTime
-    print ("==== image classification model initialized in " + str(diffTime) + " ms ====")
+    logTime("init")
 
     length = int(req.headers.getheader('content-length')) #gets correct length of data
     json_data = req.rfile.read(length) #gets json   {"image": "/9j/4AAQ...data"}
@@ -59,6 +62,8 @@ def handleRequest(req):
     image_data = json_dict['image']
 
     binary_data = a2b_base64(image_data)
+
+    logTime("step 1")
 
     scores = caffe_preprocess_and_compute(binary_data, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
     result = scores[1][0][0]
@@ -72,14 +77,9 @@ def handleRequest(req):
 
     req.wfile.write(bytes(json.dumps(resp)))
 
-    endTime = curtime()
-    diffTime = endTime - startTime
-    print("handleRequest done in ", diffTime)
+    logTime("step 2")
 
 def resize_image(data, sz=(256, 256)):
-
-    startTime = curtime()
-
     """
     Resize image. Please use this resize logic for best results instead of the 
     caffe, since it was used to generate training dataset 
@@ -98,10 +98,6 @@ def resize_image(data, sz=(256, 256)):
     fh_im = StringIO()
     imr.save(fh_im, format='JPEG')
     fh_im.seek(0)
-
-    endTime = curtime()
-    diffTime = endTime - startTime
-    print("resize_image done in ", diffTime)
 
     return bytearray(fh_im.read())
 
@@ -122,7 +118,6 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
         Returns the requested outputs from the Caffe net.
     """
     if caffe_net is not None:
-        startTime = curtime()
 
         # Grab the default output names if none were requested specifically.
         if output_layers is None:
@@ -145,20 +140,16 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
 
         outputs = all_outputs[output_layers[0]][0].astype(float)
 
-        endTime = curtime()
-        diffTime = endTime - startTime
-        print("caffe_preprocess_and_compute done in ", diffTime)
-
         return outputs
     else:
         return []
 
 class MyHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
-        #Thread(target = handleRequest(self)).start()
+        global startTime
+        startTime = curtime()
         handleRequest(self)
         return
-
 
 if sys.argv[1:]:
     address = sys.argv[1]
