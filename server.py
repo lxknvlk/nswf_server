@@ -58,12 +58,12 @@ def handleRequest(req):
 
     length = int(req.headers.getheader('content-length')) #gets correct length of data
     json_data = req.rfile.read(length) #gets json   {"image": "/9j/4AAQ...data"}
+    logTime("reading file") #1500ms here!!
     json_dict = json.loads(json_data)
     image_data = json_dict['image']
-
     binary_data = a2b_base64(image_data)
 
-    logTime("step 1")
+    logTime("preparing image")
 
     scores = caffe_preprocess_and_compute(binary_data, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
     result = scores[1][0][0]
@@ -76,8 +76,6 @@ def handleRequest(req):
     req.end_headers()
 
     req.wfile.write(bytes(json.dumps(resp)))
-
-    logTime("step 2")
 
 def resize_image(data, sz=(256, 256)):
     """
@@ -117,6 +115,7 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
     :return:
         Returns the requested outputs from the Caffe net.
     """
+
     if caffe_net is not None:
 
         # Grab the default output names if none were requested specifically.
@@ -124,6 +123,7 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
             output_layers = caffe_net.outputs
 
         img_data_rs = resize_image(pimg, sz=(256, 256))
+        logTime("resizing")
         image = caffe.io.load_image(StringIO(img_data_rs))
 
         H, W, _ = image.shape
@@ -139,7 +139,7 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
                     **{input_name: transformed_image})
 
         outputs = all_outputs[output_layers[0]][0].astype(float)
-
+        logTime("processing")
         return outputs
     else:
         return []
