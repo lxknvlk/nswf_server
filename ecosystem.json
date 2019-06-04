@@ -6,8 +6,6 @@
     instances: 1,
     exec_mode: 'fork',
     max_memory_restart : "500M",
-    interpreter : "pipenv",
-    node_args: "run python3",
     max_restarts : 5
   }]
 }
