@@ -148,7 +148,8 @@ class MyHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
         global startTime
         startTime = curtime()
-        handleRequest(self)
+        Thread(target = handleRequest(self)).start()
+        #handleRequest(self)
         return
 
 if sys.argv[1:]:

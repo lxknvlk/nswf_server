@@ -15,9 +15,9 @@
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
+          <stringProp name="LoopController.loops">10</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.num_threads">5</stringProp>
         <stringProp name="ThreadGroup.ramp_time">0</stringProp>
         <longProp name="ThreadGroup.start_time">1324216714000</longProp>
         <longProp name="ThreadGroup.end_time">1324216714000</longProp>
@@ -62,7 +62,7 @@
             <stringProp name="script">import groovy.json.JsonBuilder
 import org.apache.commons.io.IOUtils
 
-def imageStream = IOUtils.toByteArray(new URL(&quot;file:///C:/Users/Alex/Workspace/nswf_server/image/image_small.jpg&quot;));
+def imageStream = IOUtils.toByteArray(new URL(&quot;file:///home/ec2-user/image/image_small.jpg&quot;));
 def imageBase64 = Base64.getEncoder().encodeToString(imageStream);
 
 def json = new JsonBuilder();
