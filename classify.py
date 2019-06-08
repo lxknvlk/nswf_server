@@ -104,12 +104,24 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
     else:
         return []
 
-    startTime = curtime()
-
+def classify(argv):
     pycaffe_dir = os.path.dirname(__file__)
+
+    print(argv[0])
+    print(argv[1])
+
+    parser = argparse.ArgumentParser()
+    # Required arguments: input file.
+    parser.add_argument(
+        "input_file",
+        help="Path to the input image file"
+    )
 
     model_def = "NsfwSqueezenet/model/deploy.prototxt"
     pretrained_model = "NsfwSqueezenet/model/nsfw_squeezenet.caffemodel"
+
+    args = parser.parse_args()
+    print(args.input_file)
 
     # Pre-load caffe model.
     nsfw_net = caffe.Net(model_def, pretrained_model, caffe.TEST)
@@ -123,23 +135,16 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
     caffe_transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
     logTime("init")
 
-    length = int(req.headers.getheader('content-length')) #gets correct length of data
-    json_data = req.rfile.read(length) #gets json   {"image": "/9j/4AAQ...data"}
-    logTime("reading file") #1500ms here!!
-    json_dict = json.loads(json_data)
-    image_data = json_dict['image']
-    binary_data = a2b_base64(image_data)
-
     logTime("preparing image")
 
-    scores = caffe_preprocess_and_compute(binary_data, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
+    scores = caffe_preprocess_and_compute(args.input_file, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
     result = scores[1][0][0]
 
     print ("result: " , result)
 
-    resp = {'score' : result}
-    req.send_response(200)
-    req.send_header('Content-type', 'application/json')
-    req.end_headers()
+    return result
 
-    req.wfile.write(bytes(json.dumps(resp)))
+
+if __name__ == '__main__':
+    startTime = curtime()
+    classify(sys.argv)
