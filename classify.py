@@ -111,11 +111,8 @@ def classify(argv):
 
     image_data = "test"
 
-   #  # for line in fileinput.input():
-   #  #     image_data += line
-
-    # for line in sys.stdin:
-    #     image_data += line.rstrip()
+    for line in sys.stdin:
+        image_data += line.rstrip()
 
     print("image read: " + image_data)
 
