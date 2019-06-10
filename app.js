@@ -26,25 +26,23 @@ const cp = require("child_process")
 		pythonProcess.stderr.pipe(process.stderr);
 
 		pythonProcess.stdin.write(req.body.image, function(err){
-		//pythonProcess.stdin.write("some test data blablabla", function(err){
 			pythonProcess.stdin.end();
 		});
 
 		pythonProcess.stdout.on('data', (data) => {
-		    	console.log("message from python:" + data)
+		    	console.log("received result from python:" + data)
 
-		        // res.write(data, function(err) { 
-		        // 	res.status(200);
-		        // 	res.end(); 
-		        // });
+		        res.write(data)
+		        res.status(200);
+		    	res.end(); 
 			});
 
 
-		pythonProcess.stdout.on("end", (data) => {
-  			console.log("end received data: " + data);
-			res.status(200);
-		    res.end(); 
-		});
+		// pythonProcess.stdout.on("end", (data) => {
+  // 			console.log("end received data: " + data);
+		// 	res.status(200);
+		//     res.end(); 
+		// });
 	})
 
 app.use(function(err, req, res, next) {

@@ -84,7 +84,7 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
             output_layers = caffe_net.outputs
 
         img_data_rs = resize_image(pimg, sz=(256, 256))
-        logTime("resizing")
+        # logTime("resizing")
         image = caffe.io.load_image(StringIO(img_data_rs))
 
         H, W, _ = image.shape
@@ -100,34 +100,33 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
                     **{input_name: transformed_image})
 
         outputs = all_outputs[output_layers[0]][0].astype(float)
-        logTime("processing")
+        # logTime("processing")
         return outputs
     else:
         return []
 
 def classify(argv):
 
-    print("reading input image")
-    sys.stdout.flush()
+    # print("reading input image")
+    # sys.stdout.flush()
 
     image_data = ""
 
     for line in sys.stdin:
         image_data += line.rstrip()
-
-    # print("image read ok?")
-    print("image data received")
-    sys.stdout.flush()
+        
+    # print("image data received")
+    # sys.stdout.flush()
 
     binary_data = a2b_base64(image_data)
 
-    print ("transforming from base64 ok")
-    sys.stdout.flush()
+    # print ("transforming from base64 ok")
+    # sys.stdout.flush()
 
     pycaffe_dir = os.path.dirname(__file__)
 
-    print ("got dirname")
-    sys.stdout.flush()
+    # print ("got dirname")
+    # sys.stdout.flush()
 
     model_def = "NsfwSqueezenet/model/deploy.prototxt"
     pretrained_model = "NsfwSqueezenet/model/nsfw_squeezenet.caffemodel"
@@ -135,8 +134,8 @@ def classify(argv):
     # Pre-load caffe model.
     nsfw_net = caffe.Net(model_def, pretrained_model, caffe.TEST)
 
-    print ("preloaded model")
-    sys.stdout.flush()
+    # print ("preloaded model")
+    # sys.stdout.flush()
 
     # Load transformer
     # Note that the parameters are hard-coded for best results
@@ -145,17 +144,17 @@ def classify(argv):
     caffe_transformer.set_mean('data', np.array([104, 117, 123]))  # subtract the dataset-mean value in each channel
     caffe_transformer.set_raw_scale('data', 255)  # rescale from [0, 1] to [0, 255]
     caffe_transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
-    logTime("init")
+    # logTime("init")
 
-    logTime("preparing image")
+    # logTime("preparing image")
 
-    print ("initialized model")
-    sys.stdout.flush()
+    # print ("initialized model")
+    # sys.stdout.flush()
 
     scores = caffe_preprocess_and_compute(binary_data, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
     result = scores[1][0][0]
 
-    print("classification done:" + str(result))
+    print(str(result))
     sys.stdout.flush()
 
     return
