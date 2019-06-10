@@ -18,22 +18,18 @@ const cp = require("child_process")
 	app.use(bodyParser.json({ extended: true, limit: '10mb' }));
 
 	app.post('/', (req, res) => {
-		console.log("processing post request");
 		//logger.info("image data from request: " + JSON.stringify());
 
 	    const spawn = cp.spawn;
 		const pythonProcess = spawn('python',['/home/ubuntu/classify.py']);
 
-		console.log("after spawns");
-
 		pythonProcess.stdin.write(req.body.image, function(err){
 		//pythonProcess.stdin.write("some test data blablabla", function(err){
 			pythonProcess.stdin.end();
-			console.log("written stdin");
 		});
 
 		pythonProcess.stdout.on('data', (data) => {
-		    	console.log("on data response:" + data)
+		    	console.log("message from python:" + data)
 
 		        // res.write(data, function(err) { 
 		        // 	res.status(200);
