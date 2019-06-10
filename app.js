@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const port = 8000
+const cp = require("child_process")
 
 //app.post('/', (request, response) => {
 //  response.send('POST!')
@@ -9,14 +10,19 @@ const port = 8000
 app.post('/', (req, res) => {
 	console.log("got post request, processing");
 
-    const { spawn } = require('child_process');
-    const pyProg = spawn('python', ['./classify.py', "image data goes here!!!"]);
+	var image_data = "some image data"
 
-    pyProg.stdout.on('data', function(data) {
-        console.log(data.toString());
-        res.write(data);
-        res.end('end');
-    });
+    const spawn = cp.spawn;
+	const pythonProcess = spawn('python',['/home/ubuntu/classify.py', image_data]);
+	console.log("after spawns");
+
+	pythonProcess.stdout.on('data', (data) => {
+    	console.log("got some data in listener: " + data)
+
+    	res.write(data);
+    	res.status(200);
+        res.end();
+	});
 })
 
 

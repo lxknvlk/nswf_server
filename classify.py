@@ -105,42 +105,44 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
         return []
 
 def classify(argv):
-    pycaffe_dir = os.path.dirname(__file__)
+    # pycaffe_dir = os.path.dirname(__file__)
 
-    print(argv[0])
-    print(argv[1])
+    # parser = argparse.ArgumentParser()
+    # # Required arguments: input file.
+    # parser.add_argument(
+    #     "input_file",
+    #     help="Path to the input image file"
+    # )
 
-    parser = argparse.ArgumentParser()
-    # Required arguments: input file.
-    parser.add_argument(
-        "input_file",
-        help="Path to the input image file"
-    )
+    # model_def = "NsfwSqueezenet/model/deploy.prototxt"
+    # pretrained_model = "NsfwSqueezenet/model/nsfw_squeezenet.caffemodel"
 
-    model_def = "NsfwSqueezenet/model/deploy.prototxt"
-    pretrained_model = "NsfwSqueezenet/model/nsfw_squeezenet.caffemodel"
+    # args = parser.parse_args()
+    # print(args.input_file)
 
-    args = parser.parse_args()
-    print(args.input_file)
+    # # Pre-load caffe model.
+    # nsfw_net = caffe.Net(model_def, pretrained_model, caffe.TEST)
 
-    # Pre-load caffe model.
-    nsfw_net = caffe.Net(model_def, pretrained_model, caffe.TEST)
+    # # Load transformer
+    # # Note that the parameters are hard-coded for best results
+    # caffe_transformer = caffe.io.Transformer({'data': nsfw_net.blobs['data'].data.shape})
+    # caffe_transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost
+    # caffe_transformer.set_mean('data', np.array([104, 117, 123]))  # subtract the dataset-mean value in each channel
+    # caffe_transformer.set_raw_scale('data', 255)  # rescale from [0, 1] to [0, 255]
+    # caffe_transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
+    # logTime("init")
 
-    # Load transformer
-    # Note that the parameters are hard-coded for best results
-    caffe_transformer = caffe.io.Transformer({'data': nsfw_net.blobs['data'].data.shape})
-    caffe_transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost
-    caffe_transformer.set_mean('data', np.array([104, 117, 123]))  # subtract the dataset-mean value in each channel
-    caffe_transformer.set_raw_scale('data', 255)  # rescale from [0, 1] to [0, 255]
-    caffe_transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
-    logTime("init")
+    # logTime("preparing image")
 
-    logTime("preparing image")
+    # scores = caffe_preprocess_and_compute(args.input_file, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
+    # result = scores[1][0][0]
 
-    scores = caffe_preprocess_and_compute(args.input_file, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
-    result = scores[1][0][0]
+    # print ("result: " , result)
 
-    print ("result: " , result)
+    #print(result)
+
+    print("test result")
+    sys.stdout.flush()
 
     return result
 
