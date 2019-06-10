@@ -26,22 +26,26 @@ const cp = require("child_process")
 
 		console.log("after spawns");
 
-		//pythonProcess.stdin.write(req.body.image);
-		pythonProcess.stdin.write("some test data blablabla");
-		pythonProcess.stdin.end();
-
-		console.log("written stdin");
-
-		pythonProcess.stdout.on('data', (data) => {
-	    	console.log("python responsed with: " + data)
-
-	    	res.write(data);
-	    	res.status(200);
-	        res.end();
+		pythonProcess.stdin.write(req.body.image, function(err){
+		//pythonProcess.stdin.write("some test data blablabla", function(err){
+			pythonProcess.stdin.end();
+			console.log("written stdin");
 		});
 
-		pythonProcess.stdout.on("end", data => {
-  			console.log("end received, closing connection.");
+		pythonProcess.stdout.on('data', (data) => {
+		    	console.log("on data response:" + data)
+
+		        // res.write(data, function(err) { 
+		        // 	res.status(200);
+		        // 	res.end(); 
+		        // });
+			});
+
+
+		pythonProcess.stdout.on("end", (data) => {
+  			console.log("end received data: " + data);
+			res.status(200);
+		    res.end(); 
 		});
 	})
 

@@ -107,20 +107,21 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
 
 def classify(argv):
 
-    print("reading input image")
+    # print("reading input image")
 
-    image_data = "test"
+    image_data = ""
 
     for line in sys.stdin:
         image_data += line.rstrip()
 
-    print("image read: " + image_data)
+    # print("image read ok?")
+    print("image data received: " + image_data)
 
     # binary_data = a2b_base64(image_data)
 
-    # print ("transforming from base64")
+    # #print ("transforming from base64")
 
-    #pycaffe_dir = os.path.dirname(__file__)
+    # pycaffe_dir = os.path.dirname(__file__)
 
     # model_def = "NsfwSqueezenet/model/deploy.prototxt"
     # pretrained_model = "NsfwSqueezenet/model/nsfw_squeezenet.caffemodel"
@@ -144,10 +145,10 @@ def classify(argv):
 
     # print(result)
 
-    sys.stdout.write("test result")
+    #print("test result")
     sys.stdout.flush()
 
-    return result
+    return "test result from return"
 
 
 if __name__ == '__main__':
