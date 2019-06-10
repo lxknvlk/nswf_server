@@ -3,8 +3,8 @@
     name: 'server',
     script: 'app.js',
     watch: true,
-    instances: 1,
-    exec_mode: 'fork',
+    instances: 4,
+    exec_mode: 'cluster',
     max_memory_restart : "500M",
     max_restarts : 5
   }]
