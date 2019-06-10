@@ -23,6 +23,8 @@ const cp = require("child_process")
 	    const spawn = cp.spawn;
 		const pythonProcess = spawn('python',['/home/ubuntu/classify.py']);
 
+		pythonProcess.stderr.pipe(process.stderr);
+
 		pythonProcess.stdin.write(req.body.image, function(err){
 		//pythonProcess.stdin.write("some test data blablabla", function(err){
 			pythonProcess.stdin.end();

@@ -152,10 +152,10 @@ def classify(argv):
     print ("initialized model")
     sys.stdout.flush()
 
-    scores = caffe_preprocess_and_compute(args.input_file, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
+    scores = caffe_preprocess_and_compute(binary_data, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
     result = scores[1][0][0]
 
-    print("classification done:" + result)
+    print("classification done:" + str(result))
     sys.stdout.flush()
 
     return
