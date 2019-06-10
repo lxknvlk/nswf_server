@@ -17,6 +17,7 @@ import sys
 import argparse
 import glob
 import time
+import fileinput
 from PIL import Image
 try:
     from StringIO import StringIO
@@ -105,20 +106,27 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
         return []
 
 def classify(argv):
-    # pycaffe_dir = os.path.dirname(__file__)
 
-    # parser = argparse.ArgumentParser()
-    # # Required arguments: input file.
-    # parser.add_argument(
-    #     "input_file",
-    #     help="Path to the input image file"
-    # )
+    print("reading input image")
+
+    image_data = "test"
+
+   #  # for line in fileinput.input():
+   #  #     image_data += line
+
+    # for line in sys.stdin:
+    #     image_data += line.rstrip()
+
+    print("image read: " + image_data)
+
+    # binary_data = a2b_base64(image_data)
+
+    # print ("transforming from base64")
+
+    #pycaffe_dir = os.path.dirname(__file__)
 
     # model_def = "NsfwSqueezenet/model/deploy.prototxt"
     # pretrained_model = "NsfwSqueezenet/model/nsfw_squeezenet.caffemodel"
-
-    # args = parser.parse_args()
-    # print(args.input_file)
 
     # # Pre-load caffe model.
     # nsfw_net = caffe.Net(model_def, pretrained_model, caffe.TEST)
@@ -137,11 +145,9 @@ def classify(argv):
     # scores = caffe_preprocess_and_compute(args.input_file, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
     # result = scores[1][0][0]
 
-    # print ("result: " , result)
+    # print(result)
 
-    #print(result)
-
-    print("test result")
+    sys.stdout.write("test result")
     sys.stdout.flush()
 
     return result
