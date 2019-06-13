@@ -18,10 +18,9 @@ app.post('/', (req, res) => {
 	requestProcessed = false;
 	processingRequest = false;
 	handleRequest(req, res);
-	console.log("post request processed!");
 })
 
-async function handleRequest(res, req){
+async function handleRequest(req, res){
 	while (!requestProcessed){
 		if (!processingRequest){
 			processingRequest = true;
@@ -32,14 +31,14 @@ async function handleRequest(res, req){
 				var statusRes = await checkServerStatus(servport);
 				var available = parseInt(statusRes)
 				console.log("server on port "+ servport + " available: " + available);
-				
+
 				if (available == 1){
 					console.log("forwarding request to server " + servport);
 					var classifyResult = await sendImageToServer(servport, req.body)
-					console.log("response from server " + servport + " :" + classifyResult);
+					console.log("response from server " + servport + ": " + classifyResult);
 					requestProcessed = true;
 					processingRequest = false;
-					res.write(response.toString());
+					res.write(classifyResult.toString());
 					res.status(200);
 					res.end(); 
 					return;
@@ -48,7 +47,7 @@ async function handleRequest(res, req){
 		}	
 
 		console.log("restarting server checks");
-		setTimeout(handleRequest(res, req), 3000);
+		setTimeout(handleRequest(req, res), 3000);
 	}
 }
 
