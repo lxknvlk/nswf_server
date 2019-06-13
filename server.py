@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+
+import os
+# 0 - debug
+# 1 - info (still a LOT of outputs)
+# 2 - warnings
+# 3 - errors
+os.environ['GLOG_minloglevel'] = '3' 
+
 try:
     # Python 2.x
     from SocketServer import ThreadingMixIn
@@ -14,7 +22,7 @@ class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
 
 import numpy as np
-import os
+
 import sys
 import argparse
 import glob
@@ -37,7 +45,7 @@ def curtime():
 def logTime(msg):
     global startTime
     diffTime = curtime() - startTime
-    print (msg + " done in " + str(diffTime))
+    #print (msg + " done in " + str(diffTime))
     startTime = curtime()
 
 def handleRequest(req):
@@ -71,14 +79,13 @@ def handleRequest(req):
     scores = caffe_preprocess_and_compute(binary_data, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
     result = scores[1][0][0]
 
-    print ("result: " , result)
+    #print ("result: " , result)
 
-    resp = {'score' : result}
     req.send_response(200)
     req.send_header('Content-type', 'application/json')
     req.end_headers()
 
-    req.wfile.write(bytes(json.dumps(resp)))
+    req.wfile.write(result)
     available = 1
 
 def resize_image(data, sz=(256, 256)):
@@ -156,7 +163,7 @@ class MyHandler(SimpleHTTPRequestHandler):
         return
 
     def do_GET(self):
-        print("processing get request in python")
+        #print("processing get request in python")
         self.send_response(200)
         self.send_header('Content-type','text/html')
         self.end_headers()
@@ -164,14 +171,14 @@ class MyHandler(SimpleHTTPRequestHandler):
         
         return
 
-os.environ['port']
+
 port = int(os.environ['port'])
 interface = '0.0.0.0'
 
 if sys.argv[2:]:
     os.chdir(sys.argv[2])
 
-print('started python classification server on ' +  interface + ':' + str(port))
+print('started python classification server on '+ str(port))
 
 server = ThreadingSimpleServer((interface, port), MyHandler)
 try:

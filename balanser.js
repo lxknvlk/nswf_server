@@ -7,16 +7,6 @@ const port = 8000
 
 var servers = [8001, 8002, 8003, 8004]
 
-//const winston = require('winston')
-// const logger = winston.createLogger({
-//   level: 'info',
-//   format: winston.format.json(),
-//   defaultMeta: { service: 'user-service' },
-//   transports: [
-//     new winston.transports.File({ filename: 'combined.log' })
-//   ]
-// });
-
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use(bodyParser.json({ extended: true, limit: '10mb' }));
 
@@ -39,25 +29,18 @@ app.post('/', (req, res) => {
 		available = parseInt(response)
 
 		if (available == 1){
-			console.log("forwarding request to server");
-			//process request
-			sendImageToServer(servport, function(response){
-				console.log("response in balanser from sendImageToServer: " + response);
-					res.status(200);
-					res.end(); 
+			console.log("forwarding request to server " + servport);
+			sendImageToServer(servport, req.body, function(response){
+				console.log("response from server " + servport + " :" + response);
+				res.write(response.toString());
+				res.status(200);
+				res.end(); 
 			})
 		} else {
-			console.log("server busy, skipping");
 			res.status(200);
 			res.end(); 
 		}
 	});
-
-
-
-	//res.write(data);
-    //res.status(200);
-	//res.end(); 
 })
 
 app.use(function(err, req, res, next) {
@@ -71,15 +54,20 @@ function checkServerStatus(servport, callback){
 	});
 }
 
-function sendImageToServer(servport, callback){
-	request.post('http://localhost:' + servport, function (err, res, body) {
-	        if (err) console.log("error from processing image: " +  err);
-	        callback(body);
-	    }
-	);
+function sendImageToServer(servport, reqbody, callback){
+	request.post({
+		url: 'http://localhost:' + servport,
+		body: reqbody,
+		json: true
+	}, function(error, response, body){
+        if (error) console.log("error from processing image: " +  error);
+        //if (body) console.log("body from python: " + body);
+        callback(body);
+	});
 }
 
+
 app.listen(port, (err) => {
-	if (err) return console.log('something bad happened', err);
+	if (err) console.log('something bad happened', err);
 	console.log('balanser app started on port ' + port);
 })
