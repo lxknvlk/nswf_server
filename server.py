@@ -29,6 +29,8 @@ import json
 from binascii import a2b_base64
 from threading import Thread
 
+available = 1
+
 def curtime():
     return int(round(time.time() * 1000))
 
@@ -39,6 +41,7 @@ def logTime(msg):
     startTime = curtime()
 
 def handleRequest(req):
+    available = 0
     pycaffe_dir = os.path.dirname(__file__)
 
     model_def = "NsfwSqueezenet/model/deploy.prototxt"
@@ -76,6 +79,7 @@ def handleRequest(req):
     req.end_headers()
 
     req.wfile.write(bytes(json.dumps(resp)))
+    available = 1
 
 def resize_image(data, sz=(256, 256)):
     """
@@ -151,22 +155,23 @@ class MyHandler(SimpleHTTPRequestHandler):
         handleRequest(self)
         return
 
-if sys.argv[1:]:
-    address = sys.argv[1]
-    if (':' in address):
-        interface = address.split(':')[0]
-        port = int(address.split(':')[1])
-    else:
-        interface = '0.0.0.0'
-        port = int(address)
-else:
-    port = 8000
-    interface = '0.0.0.0'
+    def do_GET(self):
+        print("processing get request in python")
+        self.send_response(200)
+        self.send_header('Content-type','text/html')
+        self.end_headers()
+        self.wfile.write(available)
+        
+        return
+
+os.environ['port']
+port = int(os.environ['port'])
+interface = '0.0.0.0'
 
 if sys.argv[2:]:
     os.chdir(sys.argv[2])
 
-print('Started HTTP server on ' +  interface + ':' + str(port))
+print('started python classification server on ' +  interface + ':' + str(port))
 
 server = ThreadingSimpleServer((interface, port), MyHandler)
 try:
