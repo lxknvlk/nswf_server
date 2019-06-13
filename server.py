@@ -49,6 +49,7 @@ def logTime(msg):
     startTime = curtime()
 
 def handleRequest(req):
+    global available
     available = 0
     pycaffe_dir = os.path.dirname(__file__)
 
@@ -157,6 +158,7 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
 
 class MyHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
+        global available
         available = 0
         global startTime
         startTime = curtime()
