@@ -157,6 +157,7 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
 
 class MyHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
+        available = 0
         global startTime
         startTime = curtime()
         handleRequest(self)
@@ -168,7 +169,6 @@ class MyHandler(SimpleHTTPRequestHandler):
         self.send_header('Content-type','text/html')
         self.end_headers()
         self.wfile.write(available)
-        
         return
 
 

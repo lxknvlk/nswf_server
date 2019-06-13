@@ -24,7 +24,6 @@ async function handleRequest(req, res){
 	while (!requestProcessed){
 		if (!processingRequest){
 			processingRequest = true;
-			console.log("processing request in while/if");
 			for(var i = 0; i < servers.length; i++){
 				servport = servers[i];
 				console.log("checking server " + servport);
