@@ -35,9 +35,6 @@ except ImportError:
 import caffe
 import json
 from binascii import a2b_base64
-from threading import Thread
-
-available = 1
 
 def curtime():
     return int(round(time.time() * 1000))
@@ -49,8 +46,6 @@ def logTime(msg):
     startTime = curtime()
 
 def handleRequest(req):
-    global available
-    available = 0
     pycaffe_dir = os.path.dirname(__file__)
 
     model_def = "NsfwSqueezenet/model/deploy.prototxt"
@@ -87,7 +82,6 @@ def handleRequest(req):
     req.end_headers()
 
     req.wfile.write(result)
-    available = 1
 
 def resize_image(data, sz=(256, 256)):
     """
@@ -158,8 +152,6 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
 
 class MyHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
-        global available
-        available = 0
         global startTime
         startTime = curtime()
         handleRequest(self)
