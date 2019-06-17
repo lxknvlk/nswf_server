@@ -10,17 +10,30 @@
 //   }]
 // }
 
+  // apps : [{
+  //   name: 'balanser',
+  //   script: 'balanser.js',
+  //   watch: true,
+  //   instances: 1,
+  //   exec_mode: 'fork',
+  //   max_memory_restart : "500M",
+  //   max_restarts : 2
+  // },
+  // {
+  //   name: 'server 1',
+  //   script: 'server.py',
+  //   watch: true,
+  //   instances: 1,
+  //   exec_mode: 'fork',
+  //   max_memory_restart : "500M",
+  //   max_restarts : 2,
+  //   env: {
+  //     "port": 8001,
+  //   }
+  // }
+
 {
   apps : [{
-    name: 'balanser',
-    script: 'balanser.js',
-    watch: true,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "500M",
-    max_restarts : 2
-  },
-  {
     name: 'server 1',
     script: 'server.py',
     watch: true,
