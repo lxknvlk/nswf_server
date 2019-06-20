@@ -2,7 +2,7 @@
   apps : [{
     name: 'server 1',
     script: 'server.py',
-    watch: true,
+    watch: false,
     instances: 1,
     exec_mode: 'fork',
     max_memory_restart : "500M",
@@ -14,7 +14,7 @@
   {
     name: 'server 2',
     script: 'server.py',
-    watch: true,
+    watch: false,
     instances: 1,
     exec_mode: 'fork',
     max_memory_restart : "500M",
@@ -26,7 +26,7 @@
   {
     name: 'server 3',
     script: 'server.py',
-    watch: true,
+    watch: false,
     instances: 1,
     exec_mode: 'fork',
     max_memory_restart : "500M",
@@ -38,7 +38,7 @@
     {
     name: 'server 4',
     script: 'server.py',
-    watch: true,
+    watch: false,
     instances: 1,
     exec_mode: 'fork',
     max_memory_restart : "500M",
@@ -50,7 +50,7 @@
     {
     name: 'server 5',
     script: 'server.py',
-    watch: true,
+    watch: false,
     instances: 1,
     exec_mode: 'fork',
     max_memory_restart : "500M",
@@ -62,7 +62,7 @@
     {
     name: 'server 6',
     script: 'server.py',
-    watch: true,
+    watch: false,
     instances: 1,
     exec_mode: 'fork',
     max_memory_restart : "500M",
@@ -74,7 +74,7 @@
     {
     name: 'server 7',
     script: 'server.py',
-    watch: true,
+    watch: false,
     instances: 1,
     exec_mode: 'fork',
     max_memory_restart : "500M",
@@ -86,7 +86,7 @@
     {
     name: 'server 8',
     script: 'server.py',
-    watch: true,
+    watch: false,
     instances: 1,
     exec_mode: 'fork',
     max_memory_restart : "500M",
