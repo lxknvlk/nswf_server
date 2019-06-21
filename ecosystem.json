@@ -5,7 +5,7 @@
     watch: false,
     instances: 1,
     exec_mode: 'fork',
-    max_memory_restart : "500M",
+    max_memory_restart : "3G",
     max_restarts : 2,
     env: {
       "port": 8001
@@ -17,7 +17,7 @@
     watch: false,
     instances: 1,
     exec_mode: 'fork',
-    max_memory_restart : "500M",
+    max_memory_restart : "3G",
     max_restarts : 2,
     env: {
       "port": 8002
@@ -29,7 +29,7 @@
     watch: false,
     instances: 1,
     exec_mode: 'fork',
-    max_memory_restart : "500M",
+    max_memory_restart : "3G",
     max_restarts : 2,
     env: {
       "port": 8003
@@ -41,7 +41,7 @@
     watch: false,
     instances: 1,
     exec_mode: 'fork',
-    max_memory_restart : "500M",
+    max_memory_restart : "3G",
     max_restarts : 2,
     env: {
       "port": 8004
@@ -53,7 +53,7 @@
     watch: false,
     instances: 1,
     exec_mode: 'fork',
-    max_memory_restart : "500M",
+    max_memory_restart : "3G",
     max_restarts : 2,
     env: {
       "port": 8005
@@ -65,7 +65,7 @@
     watch: false,
     instances: 1,
     exec_mode: 'fork',
-    max_memory_restart : "500M",
+    max_memory_restart : "3G",
     max_restarts : 2,
     env: {
       "port": 8006
@@ -77,7 +77,7 @@
     watch: false,
     instances: 1,
     exec_mode: 'fork',
-    max_memory_restart : "500M",
+    max_memory_restart : "3G",
     max_restarts : 2,
     env: {
       "port": 8007
@@ -89,10 +89,94 @@
     watch: false,
     instances: 1,
     exec_mode: 'fork',
-    max_memory_restart : "500M",
+    max_memory_restart : "3G",
     max_restarts : 2,
     env: {
       "port": 8008
+    }
+  },
+    {
+    name: 'server 9',
+    script: 'server.py',
+    watch: false,
+    instances: 1,
+    exec_mode: 'fork',
+    max_memory_restart : "3G",
+    max_restarts : 2,
+    env: {
+      "port": 8009
+    }
+  },
+    {
+    name: 'server 10',
+    script: 'server.py',
+    watch: false,
+    instances: 1,
+    exec_mode: 'fork',
+    max_memory_restart : "3G",
+    max_restarts : 2,
+    env: {
+      "port": 8010
+    }
+  },
+    {
+    name: 'server 11',
+    script: 'server.py',
+    watch: false,
+    instances: 1,
+    exec_mode: 'fork',
+    max_memory_restart : "3G",
+    max_restarts : 2,
+    env: {
+      "port": 8011
+    }
+  },
+    {
+    name: 'server 12',
+    script: 'server.py',
+    watch: false,
+    instances: 1,
+    exec_mode: 'fork',
+    max_memory_restart : "3G",
+    max_restarts : 2,
+    env: {
+      "port": 8012
+    }
+  },
+    {
+    name: 'server 13',
+    script: 'server.py',
+    watch: false,
+    instances: 1,
+    exec_mode: 'fork',
+    max_memory_restart : "3G",
+    max_restarts : 2,
+    env: {
+      "port": 8013
+    }
+  },
+    {
+    name: 'server 14',
+    script: 'server.py',
+    watch: false,
+    instances: 1,
+    exec_mode: 'fork',
+    max_memory_restart : "3G",
+    max_restarts : 2,
+    env: {
+      "port": 8014
+    }
+  },
+    {
+    name: 'server 15',
+    script: 'server.py',
+    watch: false,
+    instances: 1,
+    exec_mode: 'fork',
+    max_memory_restart : "3G",
+    max_restarts : 2,
+    env: {
+      "port": 8015
     }
   }]
 }

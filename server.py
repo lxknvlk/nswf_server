@@ -41,27 +41,12 @@ def curtime():
 
 def logTime(msg):
     global startTime
-    diffTime = curtime() - startTime
+    #diffTime = curtime() - startTime
     #print (msg + " done in " + str(diffTime))
-    startTime = curtime()
+    #startTime = curtime()
 
 def handleRequest(req):
-    pycaffe_dir = os.path.dirname(__file__)
-
-    model_def = "NsfwSqueezenet/model/deploy.prototxt"
-    pretrained_model = "NsfwSqueezenet/model/nsfw_squeezenet.caffemodel"
-
-    # Pre-load caffe model.
-    nsfw_net = caffe.Net(model_def, pretrained_model, caffe.TEST)
-
-    # Load transformer
-    # Note that the parameters are hard-coded for best results
-    caffe_transformer = caffe.io.Transformer({'data': nsfw_net.blobs['data'].data.shape})
-    caffe_transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost
-    caffe_transformer.set_mean('data', np.array([104, 117, 123]))  # subtract the dataset-mean value in each channel
-    caffe_transformer.set_raw_scale('data', 255)  # rescale from [0, 1] to [0, 255]
-    caffe_transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
-    logTime("init")
+    global pycaffe_dir, model_def, pretrained_model, nsfw_net, caffe_transformer
 
     length = int(req.headers.getheader('content-length')) #gets correct length of data
     json_data = req.rfile.read(length) #gets json   {"image": "/9j/4AAQ...data"}
@@ -157,20 +142,29 @@ class MyHandler(SimpleHTTPRequestHandler):
         handleRequest(self)
         return
 
-    def do_GET(self):
-        #print("processing get request in python")
-        self.send_response(200)
-        self.send_header('Content-type','text/html')
-        self.end_headers()
-        self.wfile.write(available)
-        return
-
-
 port = int(os.environ['port'])
 interface = '0.0.0.0'
 
 if sys.argv[2:]:
     os.chdir(sys.argv[2])
+
+global pycaffe_dir, model_def, pretrained_model, nsfw_net, caffe_transformer
+pycaffe_dir = os.path.dirname(__file__)
+
+model_def = "NsfwSqueezenet/model/deploy.prototxt"
+pretrained_model = "NsfwSqueezenet/model/nsfw_squeezenet.caffemodel"
+
+# Pre-load caffe model.
+nsfw_net = caffe.Net(model_def, pretrained_model, caffe.TEST)
+
+# Load transformer
+# Note that the parameters are hard-coded for best results
+caffe_transformer = caffe.io.Transformer({'data': nsfw_net.blobs['data'].data.shape})
+caffe_transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost
+caffe_transformer.set_mean('data', np.array([104, 117, 123]))  # subtract the dataset-mean value in each channel
+caffe_transformer.set_raw_scale('data', 255)  # rescale from [0, 1] to [0, 255]
+caffe_transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
+#logTime("init")
 
 print('started python classification server on '+ str(port))
 
