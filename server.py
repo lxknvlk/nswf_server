@@ -113,6 +113,7 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
         if output_layers is None:
             output_layers = caffe_net.outputs
 
+        caffe.set_mode_gpu()
         img_data_rs = resize_image(pimg, sz=(256, 256))
         logTime("resizing")
         image = caffe.io.load_image(StringIO(img_data_rs))
@@ -159,6 +160,7 @@ nsfw_net = caffe.Net(model_def, pretrained_model, caffe.TEST)
 
 # Load transformer
 # Note that the parameters are hard-coded for best results
+caffe.set_mode_gpu()
 caffe_transformer = caffe.io.Transformer({'data': nsfw_net.blobs['data'].data.shape})
 caffe_transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost
 caffe_transformer.set_mean('data', np.array([104, 117, 123]))  # subtract the dataset-mean value in each channel
