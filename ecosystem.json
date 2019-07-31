@@ -1,7 +1,7 @@
 {
   apps : [{
     name: 'server 1',
-    script: 'server.py',
+    script: 'mount_efs/ai/nsfw_image_cpu/server.py',
     watch: true,
     instances: 1,
     exec_mode: 'fork',
@@ -15,7 +15,7 @@
   },
   {
     name: 'server 2',
-    script: 'server.py',
+    script: 'mount_efs/ai/nsfw_image_cpu/server.py',
     watch: true,
     instances: 1,
     exec_mode: 'fork',
@@ -29,7 +29,7 @@
   },
   {
     name: 'server 3',
-    script: 'server.py',
+    script: 'mount_efs/ai/nsfw_image_cpu/server.py',
     watch: true,
     instances: 1,
     exec_mode: 'fork',
