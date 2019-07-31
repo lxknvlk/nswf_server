@@ -2,181 +2,43 @@
   apps : [{
     name: 'server 1',
     script: 'server.py',
-    watch: false,
+    watch: true,
     instances: 1,
     exec_mode: 'fork',
-    max_memory_restart : "3G",
+    max_memory_restart : "2G",
+    interpreter: "python",
+    exec_interpreter: "python",
     max_restarts : 2,
     env: {
-      "port": 8001
+      "port": 8001,
     }
   },
   {
     name: 'server 2',
     script: 'server.py',
-    watch: false,
+    watch: true,
     instances: 1,
     exec_mode: 'fork',
-    max_memory_restart : "3G",
+    max_memory_restart : "2G",
+    interpreter: "python",
+    exec_interpreter: "python",
     max_restarts : 2,
     env: {
-      "port": 8002
+      "port": 8002,
     }
   },
   {
     name: 'server 3',
     script: 'server.py',
-    watch: false,
+    watch: true,
     instances: 1,
     exec_mode: 'fork',
-    max_memory_restart : "3G",
+    max_memory_restart : "2G",
+    interpreter: "python",
+    exec_interpreter: "python",
     max_restarts : 2,
     env: {
-      "port": 8003
-    }
-  },
-    {
-    name: 'server 4',
-    script: 'server.py',
-    watch: false,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "3G",
-    max_restarts : 2,
-    env: {
-      "port": 8004
-    }
-  },
-    {
-    name: 'server 5',
-    script: 'server.py',
-    watch: false,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "3G",
-    max_restarts : 2,
-    env: {
-      "port": 8005
-    }
-  },
-    {
-    name: 'server 6',
-    script: 'server.py',
-    watch: false,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "3G",
-    max_restarts : 2,
-    env: {
-      "port": 8006
-    }
-  },
-    {
-    name: 'server 7',
-    script: 'server.py',
-    watch: false,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "3G",
-    max_restarts : 2,
-    env: {
-      "port": 8007
-    }
-  },
-    {
-    name: 'server 8',
-    script: 'server.py',
-    watch: false,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "3G",
-    max_restarts : 2,
-    env: {
-      "port": 8008
-    }
-  },
-    {
-    name: 'server 9',
-    script: 'server.py',
-    watch: false,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "3G",
-    max_restarts : 2,
-    env: {
-      "port": 8009
-    }
-  },
-    {
-    name: 'server 10',
-    script: 'server.py',
-    watch: false,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "3G",
-    max_restarts : 2,
-    env: {
-      "port": 8010
-    }
-  },
-    {
-    name: 'server 11',
-    script: 'server.py',
-    watch: false,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "3G",
-    max_restarts : 2,
-    env: {
-      "port": 8011
-    }
-  },
-    {
-    name: 'server 12',
-    script: 'server.py',
-    watch: false,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "3G",
-    max_restarts : 2,
-    env: {
-      "port": 8012
-    }
-  },
-    {
-    name: 'server 13',
-    script: 'server.py',
-    watch: false,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "3G",
-    max_restarts : 2,
-    env: {
-      "port": 8013
-    }
-  },
-    {
-    name: 'server 14',
-    script: 'server.py',
-    watch: false,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "3G",
-    max_restarts : 2,
-    env: {
-      "port": 8014
-    }
-  },
-    {
-    name: 'server 15',
-    script: 'server.py',
-    watch: false,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "3G",
-    max_restarts : 2,
-    env: {
-      "port": 8015
+      "port": 8003,
     }
   }]
 }

@@ -35,18 +35,34 @@ except ImportError:
 import caffe
 import json
 from binascii import a2b_base64
+import platform 
 
 def curtime():
     return int(round(time.time() * 1000))
 
 def logTime(msg):
     global startTime
-    #diffTime = curtime() - startTime
+    diffTime = curtime() - startTime
     #print (msg + " done in " + str(diffTime))
-    #startTime = curtime()
+    startTime = curtime()
 
 def handleRequest(req):
-    global pycaffe_dir, model_def, pretrained_model, nsfw_net, caffe_transformer
+    pycaffe_dir = os.path.dirname(__file__)
+
+    model_def = "NsfwSqueezenet/model/deploy.prototxt"
+    pretrained_model = "NsfwSqueezenet/model/nsfw_squeezenet.caffemodel"
+
+    # Pre-load caffe model.
+    nsfw_net = caffe.Net(model_def, pretrained_model, caffe.TEST)
+
+    # Load transformer
+    # Note that the parameters are hard-coded for best results
+    caffe_transformer = caffe.io.Transformer({'data': nsfw_net.blobs['data'].data.shape})
+    caffe_transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost
+    caffe_transformer.set_mean('data', np.array([104, 117, 123]))  # subtract the dataset-mean value in each channel
+    caffe_transformer.set_raw_scale('data', 255)  # rescale from [0, 1] to [0, 255]
+    caffe_transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
+    logTime("init")
 
     length = int(req.headers.getheader('content-length')) #gets correct length of data
     json_data = req.rfile.read(length) #gets json   {"image": "/9j/4AAQ...data"}
@@ -113,7 +129,6 @@ def caffe_preprocess_and_compute(pimg, caffe_transformer=None, caffe_net=None,
         if output_layers is None:
             output_layers = caffe_net.outputs
 
-        caffe.set_mode_gpu()
         img_data_rs = resize_image(pimg, sz=(256, 256))
         logTime("resizing")
         image = caffe.io.load_image(StringIO(img_data_rs))
@@ -149,26 +164,7 @@ interface = '0.0.0.0'
 if sys.argv[2:]:
     os.chdir(sys.argv[2])
 
-global pycaffe_dir, model_def, pretrained_model, nsfw_net, caffe_transformer
-pycaffe_dir = os.path.dirname(__file__)
-
-model_def = "NsfwSqueezenet/model/deploy.prototxt"
-pretrained_model = "NsfwSqueezenet/model/nsfw_squeezenet.caffemodel"
-
-# Pre-load caffe model.
-nsfw_net = caffe.Net(model_def, pretrained_model, caffe.TEST)
-
-# Load transformer
-# Note that the parameters are hard-coded for best results
-caffe.set_mode_gpu()
-caffe_transformer = caffe.io.Transformer({'data': nsfw_net.blobs['data'].data.shape})
-caffe_transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost
-caffe_transformer.set_mean('data', np.array([104, 117, 123]))  # subtract the dataset-mean value in each channel
-caffe_transformer.set_raw_scale('data', 255)  # rescale from [0, 1] to [0, 255]
-caffe_transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
-#logTime("init")
-
-print('started python classification server on '+ str(port))
+print('started python classification server on '+ str(port) + " with interpreter: " + platform.python_implementation())
 
 server = ThreadingSimpleServer((interface, port), MyHandler)
 try:
