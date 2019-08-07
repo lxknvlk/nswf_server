@@ -36,6 +36,7 @@ import caffe
 import json
 from binascii import a2b_base64
 import platform 
+import requests
 
 def curtime():
     return int(round(time.time() * 1000))
@@ -65,13 +66,21 @@ def handleRequest(req):
     logTime("init")
 
     length = int(req.headers.getheader('content-length')) #gets correct length of data
-    json_data = req.rfile.read(length) #gets json   {"image": "/9j/4AAQ...data"}
+    json_data = req.rfile.read(length) #gets json   {"image": "/9j/4AAQ...data"} or {"url":"https://img.antichat.me/thumb/be380ac64e6518b170c236072169ee65_photo.jpeg"}
     logTime("reading file") #1500ms here!!
-    json_dict = json.loads(json_data)
-    image_data = json_dict['image']
-    binary_data = a2b_base64(image_data)
 
-    logTime("preparing image")
+    json_dict = json.loads(json_data)
+
+    binary_data = []
+
+    if 'image' in json_dict:
+        image_data = json_dict['image']
+        binary_data = a2b_base64(image_data)
+    elif 'url' in json_dict:
+        image_url = json_dict['url']
+        binary_data = requests.get(image_url).content
+
+    #logTime("preparing image")
 
     scores = caffe_preprocess_and_compute(binary_data, caffe_transformer=caffe_transformer, caffe_net=nsfw_net, output_layers=['prob'])
     result = scores[1][0][0]
