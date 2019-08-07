@@ -36,7 +36,7 @@ import caffe
 import json
 from binascii import a2b_base64
 import platform 
-import requests
+import urllib
 
 def curtime():
     return int(round(time.time() * 1000))
@@ -78,7 +78,7 @@ def handleRequest(req):
         binary_data = a2b_base64(image_data)
     elif 'url' in json_dict:
         image_url = json_dict['url']
-        binary_data = requests.get(image_url).content
+        binary_data = urllib.urlopen(image_url).read()
 
     #logTime("preparing image")
 
