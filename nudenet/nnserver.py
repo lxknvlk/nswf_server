@@ -7,7 +7,7 @@ import os
 # 3 - errors
 os.environ['GLOG_minloglevel'] = '3' 
 
-from nudenet import NudeDetector
+#from nudenet import NudeDetector
 
 from socketserver import ThreadingMixIn
 from http.server import SimpleHTTPRequestHandler, HTTPServer
@@ -31,6 +31,53 @@ from binascii import a2b_base64
 import platform 
 import urllib
 
+import keras
+from keras_retinanet import models
+from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize_image
+from keras_retinanet.utils.visualization import draw_box, draw_caption
+from keras_retinanet.utils.colors import label_color
+import cv2
+import tensorflow as tf
+
+class Detector():
+    detection_model = None
+    session = None
+    graph = None
+    classes = [
+        'BELLY',
+        'BUTTOCKS',
+        'F_BREAST',
+        'F_GENITALIA',
+        'M_GENETALIA',
+        'M_BREAST',
+    ]
+
+    def __init__(self, model_path):
+        self.session = tf.Session()
+        self.graph = tf.get_default_graph()
+        
+        with self.graph.as_default():
+            with self.session.as_default():
+                self.detection_model = models.load_model(model_path, backbone_name='resnet101')
+
+    def detect(self, img_path, min_prob=0.6):
+        with self.graph.as_default():
+            with self.session.as_default():
+                image = read_image_bgr(img_path)
+                image = preprocess_image(image)
+                image, scale = resize_image(image)
+                boxes, scores, labels = self.detection_model.predict_on_batch(np.expand_dims(image, axis=0))
+                boxes /= scale
+                processed_boxes = []
+                for box, score, label in zip(boxes[0], scores[0], labels[0]):
+                    if score < min_prob:
+                        continue
+                    box = box.astype(int).tolist()
+                    label = Detector.classes[label]
+                    processed_boxes.append({'box': box, 'score': score, 'label': label})
+
+        return processed_boxes
+
 def curtime():
     return int(round(time.time() * 1000))
 
@@ -41,24 +88,9 @@ def logTime(msg):
     startTime = curtime()
 
 def handleRequest(req):
-    # length = int(req.headers.getheader('content-length')) #gets correct length of data
-    # json_data = req.rfile.read(length) #gets json   {"image": "/9j/4AAQ...data"} or {"url":"https://img.antichat.me/thumb/be380ac64e6518b170c236072169ee65_photo.jpeg"}
-    # logTime("reading file") #1500ms here!!
-
-    # json_dict = json.loads(json_data)
-
-    # binary_data = []
-
-    # if 'image' in json_dict:
-    #     image_data = json_dict['image']
-    #     binary_data = a2b_base64(image_data)
-    # elif 'url' in json_dict:
-    #     image_url = json_dict['url']
-    #     binary_data = urllib.urlopen(image_url).read()
-
-    #logTime("preparing image")
+    logTime("starting detection")
     global detector
-    result = detector.detect('/home/ubuntu/image/image_small.jpg')
+    result = detector.detect('/home/ubuntu/image/porn.jpg')
 
     print ("result: " , result)
 
@@ -66,7 +98,9 @@ def handleRequest(req):
     req.send_header('Content-type', 'application/json')
     req.end_headers()
 
-    req.wfile.write(result)
+    logTime("detection done")
+
+    req.wfile.write(str(result).encode())
 
 
 class MyHandler(SimpleHTTPRequestHandler):
@@ -83,7 +117,8 @@ if sys.argv[2:]:
     os.chdir(sys.argv[2])
 
 global detector
-detector = NudeDetector('/home/ubuntu/NudeNet/detector_model')
+#detector = NudeDetector('/home/ubuntu/NudeNet/detector_model')
+detector = Detector('/home/ubuntu/NudeNet/detector_model')
 
 print('started python classification server on '+ str(port) + " with interpreter: " + platform.python_implementation())
 
