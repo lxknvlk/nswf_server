@@ -44,10 +44,14 @@ class Detector():
 
 		return processed_boxes
 
+
 #from nudenet import NudeDetector
 #detector = NudeDetector('/home/ubuntu/NudeNet/detector_model')
 detector = Detector('/home/ubuntu/NudeNet/detector_model')
 result = detector.detect('/home/ubuntu/image/image_small.jpg')
 
+print("GPU Available: ", tf.test.is_gpu_available())
+print("Built with cuda: ", tf.test.is_built_with_cuda())
+sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 print("=============RESULT BELOW============\n")
 print(result)
