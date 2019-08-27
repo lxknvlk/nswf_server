@@ -12,33 +12,5 @@
     env: {
       "port": 8001,
     }
-  },
-  {
-    name: 'server 2',
-    script: 'nnserver.py',
-    watch: true,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "2G",
-    interpreter: "python3",
-    exec_interpreter: "python3",
-    max_restarts : 2,
-    env: {
-      "port": 8002,
-    }
-  },
-  {
-    name: 'server 3',
-    script: 'nnserver.py',
-    watch: true,
-    instances: 1,
-    exec_mode: 'fork',
-    max_memory_restart : "2G",
-    interpreter: "python3",
-    exec_interpreter: "python3",
-    max_restarts : 2,
-    env: {
-      "port": 8003,
-    }
   }]
 }
