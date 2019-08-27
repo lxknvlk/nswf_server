@@ -88,9 +88,27 @@ def logTime(msg):
     startTime = curtime()
 
 def handleRequest(req):
+    print("got request")
+
+    length = int(req.headers['Content-Length']) #gets correct length of data
+    json_data = req.rfile.read(length) #gets json   {"image": "url"}
+    json_dict = json.loads(json_data)
+
+    print("got json:" + str(json_dict))
+
+    photoName = ""
+
+    if 'photoName' in json_dict:
+        photoName = json_dict['photoName']
+
+    print("got photoName: " + photoName)
+    photo_path = '/home/ubuntu/s3photobucket/' + photoName
+
+    print("checking photo path: " + photo_path)
+
     logTime("starting detection")
     global detector
-    result = detector.detect('/home/ubuntu/image/porn.jpg')
+    result = detector.detect(photo_path)
 
     print ("result: " , result)
 
