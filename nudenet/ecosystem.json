@@ -2,7 +2,7 @@
   apps : [{
     name: 'server 1',
     script: 'nnserver.py',
-    watch: true,
+    watch: false,
     instances: 1,
     exec_mode: 'fork',
     max_memory_restart : "20G",
