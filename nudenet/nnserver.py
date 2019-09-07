@@ -112,13 +112,15 @@ def handleRequest(req):
 
     print ("result: " , result)
 
+    logTime("detection done")
+
+    strres = str(result)
+    encodedres = strres.encode()
+
     req.send_response(200)
     req.send_header('Content-type', 'application/json')
     req.end_headers()
-
-    logTime("detection done")
-
-    req.wfile.write(str(result).encode())
+    req.wfile.write(encodedres)
 
 
 class MyHandler(SimpleHTTPRequestHandler):
@@ -137,6 +139,9 @@ if sys.argv[2:]:
 global detector
 #detector = NudeDetector('/home/ubuntu/NudeNet/detector_model')
 detector = Detector('/home/ubuntu/NudeNet/detector_model')
+
+initres = detector.detect('/home/ubuntu/image/image_small.jpg')
+print ("init image result: " , initres)
 
 print('started python classification server on '+ str(port) + " with interpreter: " + platform.python_implementation())
 
