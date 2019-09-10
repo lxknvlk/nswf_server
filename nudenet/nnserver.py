@@ -39,6 +39,11 @@ from keras_retinanet.utils.colors import label_color
 import cv2
 import tensorflow as tf
 
+import glob
+import shutil
+import os
+from requests.models import Request
+
 class Detector():
     detection_model = None
     session = None
@@ -84,16 +89,19 @@ def curtime():
 def logTime(msg):
     global startTime
     diffTime = curtime() - startTime
-    #print (msg + " done in " + str(diffTime))
+    #print (">>>>>>>>>>" + msg + " done in " + str(diffTime))
     startTime = curtime()
 
 def handleRequest(req):
     print("got request")
 
+    logTime("starting processing")
+
     length = int(req.headers['Content-Length']) #gets correct length of data
     json_data = req.rfile.read(length) #gets json   {"image": "url"}
     json_dict = json.loads(json_data)
 
+    logTime("got json")
     print("got json:" + str(json_dict))
 
     photoName = ""
@@ -103,11 +111,9 @@ def handleRequest(req):
 
     print("got photoName: " + photoName)
     photo_path = '/home/ubuntu/s3photobucket/' + photoName
-
+    logTime("got photo")
     print("checking photo path: " + photo_path)
 
-    logTime("starting detection")
-    global detector
     result = detector.detect(photo_path)
 
     print ("result: " , result)
@@ -120,6 +126,7 @@ def handleRequest(req):
     req.send_response(200)
     req.send_header('Content-type', 'application/json')
     req.end_headers()
+    logTime("writing result")
     req.wfile.write(encodedres)
 
 
@@ -137,15 +144,12 @@ if sys.argv[2:]:
     os.chdir(sys.argv[2])
 
 global detector
-#detector = NudeDetector('/home/ubuntu/NudeNet/detector_model')
 detector = Detector('/home/ubuntu/NudeNet/detector_model')
-
-initres = detector.detect('/home/ubuntu/image/image_small.jpg')
-print ("init image result: " , initres)
 
 print('started python classification server on '+ str(port) + " with interpreter: " + platform.python_implementation())
 
 server = ThreadingSimpleServer((interface, port), MyHandler)
+
 try:
     while 1:
         sys.stdout.flush()
