@@ -31,6 +31,8 @@ from binascii import a2b_base64
 import platform 
 import urllib
 
+print("sys path: " + str(sys.path))
+
 import keras
 from keras_retinanet import models
 from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize_image
@@ -42,7 +44,8 @@ import tensorflow as tf
 import glob
 import shutil
 import os
-from requests.models import Request
+import requests
+from threading import Thread
 
 class Detector():
     detection_model = None
@@ -89,11 +92,11 @@ def curtime():
 def logTime(msg):
     global startTime
     diffTime = curtime() - startTime
-    #print (">>>>>>>>>>" + msg + " done in " + str(diffTime))
+    print (">>>>>>>>>>" + msg + " done in " + str(diffTime))
     startTime = curtime()
 
 def handleRequest(req):
-    print("got request")
+    #print("got request")
 
     logTime("starting processing")
 
@@ -102,7 +105,8 @@ def handleRequest(req):
     json_dict = json.loads(json_data)
 
     logTime("got json")
-    print("got json:" + str(json_dict))
+    #print("got json:" + str(json_dict))
+    #print("got json, type:" + str(type(json_dict)))
 
     photoName = ""
 
@@ -112,7 +116,7 @@ def handleRequest(req):
     print("got photoName: " + photoName)
     photo_path = '/home/ubuntu/s3photobucket/' + photoName
     logTime("got photo")
-    print("checking photo path: " + photo_path)
+    #print("checking photo path: " + photo_path)
 
     result = detector.detect(photo_path)
 
@@ -137,6 +141,24 @@ class MyHandler(SimpleHTTPRequestHandler):
         handleRequest(self)
         return
 
+def init_lib(delay):
+    time.sleep(delay)
+    print("initializing...")
+
+    src_dir = "/home/ubuntu/mount_efs/ai/nudenet"
+    dst_dir = "/home/ubuntu/s3photobucket"
+    for jpgfile in glob.iglob(os.path.join(src_dir, "pic.jpg")):
+        shutil.copy(jpgfile, dst_dir)
+
+    send_data = {}
+    send_data['photoName'] = 'pic.jpg'
+    send_json = json.dumps(send_data)
+
+    testres = requests.post('http://127.0.0.1:80', json=send_data)
+    print("testres: " + str(testres))
+
+
+
 port = int(os.environ['port'])
 interface = '0.0.0.0'
 
@@ -145,6 +167,17 @@ if sys.argv[2:]:
 
 global detector
 detector = Detector('/home/ubuntu/NudeNet/detector_model')
+
+Thread(target = init_lib, args=(2,)).start()
+Thread(target = init_lib, args=(5,)).start()
+Thread(target = init_lib, args=(10,)).start()
+Thread(target = init_lib, args=(15,)).start()
+Thread(target = init_lib, args=(20,)).start()
+Thread(target = init_lib, args=(25,)).start()
+Thread(target = init_lib, args=(30,)).start()
+Thread(target = init_lib, args=(35,)).start()
+Thread(target = init_lib, args=(40,)).start()
+Thread(target = init_lib, args=(45,)).start()
 
 print('started python classification server on '+ str(port) + " with interpreter: " + platform.python_implementation())
 
