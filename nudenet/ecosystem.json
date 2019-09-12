@@ -1,7 +1,7 @@
 {
   apps : [{
     name: 'server 1',
-    script: 'nnserver.py',
+    script: 'mount_efs/ai/nudenet/nnserver.py',
     watch: false,
     instances: 1,
     exec_mode: 'fork',
