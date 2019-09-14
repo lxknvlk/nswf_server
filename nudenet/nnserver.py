@@ -71,7 +71,9 @@ class Detector():
     def detect(self, img_path, min_prob=0.6):
         with self.graph.as_default():
             with self.session.as_default():
+                logTime("reading img path")
                 image = read_image_bgr(img_path)
+                logTime("done reading im")
                 image = preprocess_image(image)
                 image, scale = resize_image(image)
                 boxes, scores, labels = self.detection_model.predict_on_batch(np.expand_dims(image, axis=0))
@@ -82,7 +84,7 @@ class Detector():
                         continue
                     box = box.astype(int).tolist()
                     label = Detector.classes[label]
-                    processed_boxes.append({'box': box, 'score': score, 'label': label})
+                    processed_boxes.append({"box": box, "score": score, "label": label})
 
         return processed_boxes
 
@@ -92,13 +94,13 @@ def curtime():
 def logTime(msg):
     global startTime
     diffTime = curtime() - startTime
-    print (">>>>>>>>>>" + msg + " done in " + str(diffTime))
+    print (">>>>> logTime: " + msg + " done in " + str(diffTime))
     startTime = curtime()
 
 def handleRequest(req):
     #print("got request")
 
-    logTime("starting processing")
+    logTime("=================starting processing")
 
     length = int(req.headers['Content-Length']) #gets correct length of data
     json_data = req.rfile.read(length) #gets json   {"image": "url"}
@@ -118,6 +120,7 @@ def handleRequest(req):
     logTime("got photo")
     #print("checking photo path: " + photo_path)
 
+    global detector
     result = detector.detect(photo_path)
 
     print ("result: " , result)
@@ -150,11 +153,7 @@ def init_lib(delay):
     for jpgfile in glob.iglob(os.path.join(src_dir, "pic.jpg")):
         shutil.copy(jpgfile, dst_dir)
 
-    send_data = {}
-    send_data['photoName'] = 'pic.jpg'
-    send_json = json.dumps(send_data)
-
-    testres = requests.post('http://127.0.0.1:80', json=send_data)
+    testres = detector.detect("/home/ubuntu/s3photobucket/pic.jpg")
     print("testres: " + str(testres))
 
 
@@ -165,19 +164,13 @@ interface = '0.0.0.0'
 if sys.argv[2:]:
     os.chdir(sys.argv[2])
 
+global startTime
+startTime = curtime()
+
 global detector
 detector = Detector('/home/ubuntu/NudeNet/detector_model')
 
-Thread(target = init_lib, args=(2,)).start()
 Thread(target = init_lib, args=(5,)).start()
-Thread(target = init_lib, args=(10,)).start()
-Thread(target = init_lib, args=(15,)).start()
-Thread(target = init_lib, args=(20,)).start()
-Thread(target = init_lib, args=(25,)).start()
-Thread(target = init_lib, args=(30,)).start()
-Thread(target = init_lib, args=(35,)).start()
-Thread(target = init_lib, args=(40,)).start()
-Thread(target = init_lib, args=(45,)).start()
 
 print('started python classification server on '+ str(port) + " with interpreter: " + platform.python_implementation())
 
