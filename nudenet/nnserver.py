@@ -46,6 +46,7 @@ import shutil
 import os
 import requests
 from threading import Thread
+import threading as th
 
 class Detector():
     detection_model = None
