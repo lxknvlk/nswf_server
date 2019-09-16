@@ -101,6 +101,7 @@ def logTime(msg):
     startTime = curtime()
 
 def handleRequest(req):
+    start = curtime()
     #print("got request, current thread count: " + str(th.active_count()))
 
     logTime("=================starting processing")
@@ -138,6 +139,11 @@ def handleRequest(req):
     req.end_headers()
     logTime("writing result")
     req.wfile.write(encodedres)
+
+    end = curtime()
+    diff = end - start
+
+    print("checking photo " + photoName + ", done in " + str(diff))
 
 
 class MyHandler(SimpleHTTPRequestHandler):
