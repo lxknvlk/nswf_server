@@ -31,7 +31,7 @@ from binascii import a2b_base64
 import platform 
 import urllib
 
-print("sys path: " + str(sys.path))
+# print("sys path: " + str(sys.path))
 
 import keras
 from keras_retinanet import models
@@ -94,11 +94,11 @@ def curtime():
 def logTime(msg):
     global startTime
     diffTime = curtime() - startTime
-    print (">>>>> logTime: " + msg + " done in " + str(diffTime))
+    #print (">>>>> logTime: " + msg + " done in " + str(diffTime))
     startTime = curtime()
 
 def handleRequest(req):
-    #print("got request")
+    #print("got request, current thread count: " + str(th.active_count()))
 
     logTime("=================starting processing")
 
@@ -115,7 +115,7 @@ def handleRequest(req):
     if 'photoName' in json_dict:
         photoName = json_dict['photoName']
 
-    print("got photoName: " + photoName)
+    # print("got photoName: " + photoName)
     photo_path = '/home/ubuntu/s3photobucket/' + photoName
     logTime("got photo")
     #print("checking photo path: " + photo_path)
@@ -123,7 +123,7 @@ def handleRequest(req):
     global detector
     result = detector.detect(photo_path)
 
-    print ("result: " , result)
+    #print ("result: " + str(result))
 
     logTime("detection done")
 
