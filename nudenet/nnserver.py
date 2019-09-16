@@ -62,7 +62,9 @@ class Detector():
     ]
 
     def __init__(self, model_path):
-        self.session = tf.Session()
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth=True
+        self.session = tf.Session(config=config)
         self.graph = tf.get_default_graph()
         
         with self.graph.as_default():
