@@ -84,9 +84,9 @@ class Detector():
                         continue
                     box = box.astype(int).tolist()
                     label = Detector.classes[label]
-                    processed_boxes.append({"box": box, "score": score, "label": label})
+                    processed_boxes.append({'box': box, 'score': score, 'label': label})
 
-        return processed_boxes
+        return json.dumps(json.loads(str(processed_boxes).replace("\'", "\"")))
 
 def curtime():
     return int(round(time.time() * 1000))
