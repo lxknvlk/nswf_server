@@ -52,6 +52,7 @@ class Detector():
     detection_model = None
     session = None
     graph = None
+    model_path = ""
     classes = [
         'BELLY',
         'BUTTOCKS',
@@ -62,14 +63,26 @@ class Detector():
     ]
 
     def __init__(self, model_path):
+        self.model_path = model_path
+        self.reset_graph()
+        self.reset_session()
+
+    def reset_graph(self):
+        tf.reset_default_graph()
+        self.graph = tf.get_default_graph()
+
+    def reset_session(self):
+        if self.session is not None: self.session.close()
         config = tf.ConfigProto()
         config.gpu_options.allow_growth=True
+        config.intra_op_parallelism_threads=1
+        config.inter_op_parallelism_threads=1
+
         self.session = tf.Session(config=config)
-        self.graph = tf.get_default_graph()
-        
+
         with self.graph.as_default():
             with self.session.as_default():
-                self.detection_model = models.load_model(model_path, backbone_name='resnet101')
+                self.detection_model = models.load_model(self.model_path, backbone_name='resnet101')
 
     def detect(self, img_path, min_prob=0.6):
         with self.graph.as_default():
@@ -89,6 +102,9 @@ class Detector():
                     label = Detector.classes[label]
                     processed_boxes.append({'box': box, 'score': score, 'label': label})
 
+        self.reset_graph()
+        # self.reset_session()
+
         return json.dumps(json.loads(str(processed_boxes).replace("\'", "\"")))
 
 def curtime():
@@ -102,7 +118,7 @@ def logTime(msg):
 
 def handleRequest(req):
     start = curtime()
-    #print("got request, current thread count: " + str(th.active_count()))
+    threads = th.active_count()
 
     logTime("=================starting processing")
 
@@ -143,7 +159,7 @@ def handleRequest(req):
     end = curtime()
     diff = end - start
 
-    print("checking photo " + photoName + ", done in " + str(diff))
+    print("th:" + str(threads) + ", done in " + str(diff) + ", res: " + str(strres))
 
 
 class MyHandler(SimpleHTTPRequestHandler):
