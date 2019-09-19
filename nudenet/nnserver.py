@@ -116,9 +116,19 @@ def logTime(msg):
     #print (">>>>> logTime: " + msg + " done in " + str(diffTime))
     startTime = curtime()
 
+def finish_request(req, res):
+    req.send_response(200)
+    req.send_header('Content-type', 'application/json')
+    req.end_headers()
+    req.wfile.write(res.encode())
+
 def handleRequest(req):
     start = curtime()
     threads = th.active_count()
+
+    if threads > 10: 
+        finish_request(req, "")
+        return
 
     logTime("=================starting processing")
 
@@ -148,18 +158,16 @@ def handleRequest(req):
     logTime("detection done")
 
     strres = str(result)
-    encodedres = strres.encode()
 
-    req.send_response(200)
-    req.send_header('Content-type', 'application/json')
-    req.end_headers()
+
     logTime("writing result")
-    req.wfile.write(encodedres)
+
+    finish_request(req, strres)
 
     end = curtime()
     diff = end - start
 
-    print("th:" + str(threads) + ", done in " + str(diff) + ", res: " + str(strres))
+    print("threads: " + str(threads) + ", request processed in " + str(diff))
 
 
 class MyHandler(SimpleHTTPRequestHandler):
