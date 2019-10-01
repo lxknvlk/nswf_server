@@ -31,6 +31,10 @@ from binascii import a2b_base64
 import platform 
 import urllib
 
+import requests
+from io import BytesIO
+
+
 # print("sys path: " + str(sys.path))
 
 import keras
@@ -77,6 +81,7 @@ class Detector():
         config.gpu_options.allow_growth=True
         config.intra_op_parallelism_threads=1
         config.inter_op_parallelism_threads=1
+        # config.log_device_placement=True
 
         self.session = tf.Session(config=config)
 
@@ -84,12 +89,16 @@ class Detector():
             with self.session.as_default():
                 self.detection_model = models.load_model(self.model_path, backbone_name='resnet101')
 
-    def detect(self, img_path, min_prob=0.6):
+    def detect(self, img, min_prob=0.6):
         with self.graph.as_default():
             with self.session.as_default():
                 logTime("reading img path")
-                image = read_image_bgr(img_path)
+                # image = read_image_bgr(img_path)
+
+                image = np.asarray(img.convert('RGB'))
+                image = image[:, :, ::-1].copy()
                 logTime("done reading im")
+
                 image = preprocess_image(image)
                 image, scale = resize_image(image)
                 boxes, scores, labels = self.detection_model.predict_on_batch(np.expand_dims(image, axis=0))
@@ -113,21 +122,19 @@ def curtime():
 def logTime(msg):
     global startTime
     diffTime = curtime() - startTime
-    #print (">>>>> logTime: " + msg + " done in " + str(diffTime))
+    # print (">>>>> logTime: " + msg + " done in " + str(diffTime))
     startTime = curtime()
-
-def finish_request(req, res):
-    req.send_response(200)
-    req.send_header('Content-type', 'application/json')
-    req.end_headers()
-    req.wfile.write(res.encode())
 
 def handleRequest(req):
     start = curtime()
     threads = th.active_count()
 
-    if threads > 10: 
-        finish_request(req, "")
+    if threads > 7: 
+        print("threads: " + str(threads) + ", skipping request")
+        req.send_response(503)
+        req.send_header('Content-type', 'application/json')
+        req.end_headers()
+        req.wfile.write("too many threads, request skippped".encode())
         return
 
     logTime("=================starting processing")
@@ -146,23 +153,29 @@ def handleRequest(req):
         photoName = json_dict['photoName']
 
     # print("got photoName: " + photoName)
-    photo_path = '/home/ubuntu/s3photobucket/' + photoName
+    # photo_path = 'https://img.antichat.me/thumb/' + photoName
+    photo_path = 'http://s3antichat.s3.amazonaws.com/' + photoName
     logTime("got photo")
-    #print("checking photo path: " + photo_path)
+    # print("checking photo path: " + photo_path)
+
+    response = requests.get(photo_path)
+    img = Image.open(BytesIO(response.content))
 
     global detector
-    result = detector.detect(photo_path)
+    result = detector.detect(img)
 
-    #print ("result: " + str(result))
+    # print ("result: " + str(result))
 
     logTime("detection done")
 
     strres = str(result)
 
-
     logTime("writing result")
 
-    finish_request(req, strres)
+    req.send_response(200)
+    req.send_header('Content-type', 'application/json')
+    req.end_headers()
+    req.wfile.write(strres.encode())
 
     end = curtime()
     diff = end - start
@@ -181,13 +194,12 @@ def init_lib(delay):
     time.sleep(delay)
     print("initializing...")
 
-    src_dir = "/home/ubuntu/mount_efs/ai/nudenet"
-    dst_dir = "/home/ubuntu/s3photobucket"
-    for jpgfile in glob.iglob(os.path.join(src_dir, "pic.jpg")):
-        shutil.copy(jpgfile, dst_dir)
+    test_img_path = "/home/ubuntu/mount_efs/ai/nudenet/pic.jpg"
+    test_img = Image.open(test_img_path)
 
-    testres = detector.detect("/home/ubuntu/s3photobucket/pic.jpg")
-    print("testres: " + str(testres))
+    global detector
+    test_res = detector.detect(test_img)
+    print("testres: " + str(test_res))
 
 
 

@@ -1,16 +1,61 @@
 {
   apps : [{
     name: 'server 1',
-    script: 'mount_efs/ai/nudenet/nnserver.py',
+    script: '/home/ubuntu/mount_efs/ai/nudenet.v2/nnserver.py',
     watch: false,
     instances: 1,
     exec_mode: 'fork',
-    max_memory_restart : "20G",
+    max_memory_restart : "4G",
     interpreter: "python3",
     exec_interpreter: "python3",
     max_restarts : 2,
     env: {
       "port": 8001,
+      "TF_CUDNN_USE_AUTOTUNE": 0
+    }
+  },
+{
+    name: 'server 2',
+    script: '/home/ubuntu/mount_efs/ai/nudenet.v2/nnserver.py',
+    watch: false,
+    instances: 1,
+    exec_mode: 'fork',
+    max_memory_restart : "4G",
+    interpreter: "python3",
+    exec_interpreter: "python3",
+    max_restarts : 2,
+    env: {
+      "port": 8002,
+      "TF_CUDNN_USE_AUTOTUNE": 0
+    }
+  },
+{
+    name: 'server 3',
+    script: '/home/ubuntu/mount_efs/ai/nudenet.v2/nnserver.py',
+    watch: false,
+    instances: 1,
+    exec_mode: 'fork',
+    max_memory_restart : "4G",
+    interpreter: "python3",
+    exec_interpreter: "python3",
+    max_restarts : 2,
+    env: {
+      "port": 8003,
+      "TF_CUDNN_USE_AUTOTUNE": 0
+    }
+  },
+{
+    name: 'server 4',
+    script: '/home/ubuntu/mount_efs/ai/nudenet.v2/nnserver.py',
+    watch: false,
+    instances: 1,
+    exec_mode: 'fork',
+    max_memory_restart : "4G",
+    interpreter: "python3",
+    exec_interpreter: "python3",
+    max_restarts : 2,
+    env: {
+      "port": 8004,
       "TF_CUDNN_USE_AUTOTUNE": 0
     }
   }]
